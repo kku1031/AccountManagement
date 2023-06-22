@@ -1,44 +1,63 @@
-//package com.example.account.service;
-//
-//import com.example.account.domain.Account;
-//import com.example.account.type.AccountStatus;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//@SpringBootTest //build.gradle에 spring-boot-starter-test에서 가능
-////Bean들이 다 포함되어 있음 -> 이말은 = 주입이 가능 -> Autowired 사용가능
-//class AccountServiceTest {
-//    @Autowired
-//    private AccountService accountService;
-//
-//    //무조건 밑에꺼 테스트 하기 전에 이거 먼저 작동(사전에 데이터 저장)
-//    @BeforeEach
-//    void init() {
-//        accountService.createAccount();
-//    }
-//
-//    @Test
-//    @DisplayName("Test 이름 변경")
-//    void testGetAccount() {
-//        Account account = accountService.getAccount(1L);
-//        assertEquals("40000", account.getAccountNumber());
-//        assertEquals(AccountStatus.IN_USE, account.getAccountStatus());
-//    }
-//
-//    @Test
-//    void testGetAccount2() {
-//        Account account = accountService.getAccount(2L);
-//        assertEquals("40000", account.getAccountNumber());
-//        assertEquals(AccountStatus.IN_USE, account.getAccountStatus());
-//    }
-//    //문제점 :
-//    // 1. 사전에 데이터를 만들어야하고
-//    // 2. 상황이 맞지 않으면 동일한 테스트인데도 어떨땐 맞고, 어떨땐 틀림.
-//    // 3. 다양한 데이터를 미리 만들어야하는 상황이면, 사전 준비 과정이 까다로워짐
-//    //=> Mockito : Mocking을 통한 격리성을 확보해주는 test 라이브러리 중에 하나.
-//}
+package com.example.account.service;
+
+import com.example.account.domain.Account;
+import com.example.account.domain.AccountUser;
+import com.example.account.dto.AccountDto;
+import com.example.account.repository.AccountRepository;
+import com.example.account.repository.AccountUserRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+@ExtendWith(MockitoExtension.class)
+class AccountServiceTest {
+    @Mock
+    private AccountRepository accountRepository;
+
+    @Mock
+    private AccountUserRepository accountUserRepository;
+
+    // 2개의 Mock이 달려있는 AccountService가 생성
+    @InjectMocks
+    private AccountService accountService;
+
+    @Test
+    void createAccountSuccess() {
+        // given: 어떤 데이터가 있을 때
+        AccountUser user = AccountUser.builder()
+                .id(12L)
+                .name("Pobi").build();
+        given(accountUserRepository.findById(anyLong()))
+                .willReturn(Optional.of(user)); // AccountService의 user 객체를 반환하도록 설정
+        given(accountRepository.findFirstByOrderByIdDesc())
+                .willReturn(Optional.of(Account.builder()
+                        .accountNumber("1000000012").build())); // AccountService의 계좌번호 객체 반환
+        given(accountRepository.save(any()))
+                .willReturn(Account.builder()
+                        .accountUser(user)
+                        .accountNumber("1000000015").build()); // AccountService 유저와 계좌번호 전부 저장되있음.
+
+        ArgumentCaptor<Account> captor = ArgumentCaptor.forClass(Account.class);
+
+        // when: 어떤 동작을 하게 되면 (응답값)
+        AccountDto accountDto = accountService.createAccount(1L, 1000L); // createAccount() 메서드 호출
+
+        // then: 어떤 결과가 나와야 함
+
+        verify(accountRepository, times(1)).save(captor.capture());
+        assertEquals(12L, accountDto.getUserId()); // accountDto.getUserId()의 값이 12L과 일치하는지 검증
+        assertEquals("1000000013", captor.getValue().getAccountNumber()); // accountDto.getAccountNumber()의 값이 "1000000013"과 일치하는지 검증
+    }
+}

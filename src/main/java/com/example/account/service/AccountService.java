@@ -24,8 +24,8 @@ import static com.example.account.type.AccountStatus.IN_USE;
 public class AccountService {
     //final들어가면 생성자만 받을 수 있음.(과거 autowired로 주입했음)
     private final AccountRepository accountRepository;
-
     private final AccountUserRepository accountUserRepository;
+
     /**
      * 사용자가 있는지 조회
      * 계좌의 번호를 생성하고
