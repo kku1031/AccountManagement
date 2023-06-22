@@ -13,7 +13,7 @@ spring:
     console:
       enabled: true
   jpa:
-    defer-datasource-initialization: true
+    defer-datasource-initialization: true #이게 있어야 data.sql에 인식.
     database-platform: H2
     hibernate:
       ddl-auto: create-drop

@@ -43,22 +43,18 @@ public class AccountService {
                 .orElse("1000000000"); //계좌가 없으면 최초생성
 
         //builder로 account 계좌 저장
-
-        Account account = accountRepository.save(
-                Account.builder()
+        //Account(Entity) -> accountRepository에 저장 -> 그러고 나온 entity
+        //-> fromEntity에 저장 -> fromEntity의 Entity -> AccountDto에 저장
+        //-> Controller에서 받아서 사용
+        return AccountDto.fromEntity(
+                accountRepository.save(Account.builder()
                         .accountUser(accountUser)
                         .accountStatus(IN_USE)
                         .accountNumber(newAccountNumber)
                         .balance(initialBalance)
                         .registeredAt(LocalDateTime.now())
-                        .build()
+                        .build())
         );
-
-        if (account.getAccountNumber() == "1234") {
-            account.setAccountStatus(IN_USE);
-        }
-
-        return AccountDto.fromEntity(account);
     }
 
     //생성된거 DB로 가져옴(select)

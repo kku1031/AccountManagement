@@ -22,7 +22,7 @@ public class Account {
     private Long id;
 
     //컬럼 추가
-    @ManyToMany //유저를 N:1로 가짐. DB테이블에 user가 있어서 충돌날수도, AccountUser로 명시
+    @ManyToOne //유저를 N:1로 가짐. DB테이블에 user가 있어서 충돌날수도, AccountUser로 명시
     private AccountUser accountUser;
     private String accountNumber;
 

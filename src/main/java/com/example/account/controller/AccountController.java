@@ -6,11 +6,8 @@ import com.example.account.service.AccountService;
 import com.example.account.service.RedisTestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import redis.embedded.Redis;
 
 import javax.validation.Valid;
-
-
 @RestController //@RestController는 @Controller에 @ResponseBody가 추가된 것입니다. 당연하게도 RestController의 주용도는 Json 형태로 객체 데이터를 반환
 @RequiredArgsConstructor
 public class AccountController {
@@ -27,13 +24,16 @@ public class AccountController {
 
     @PostMapping("/account")
 //  @RequestBody는 클라이언트가 전송하는 Json(application/json) 형태의 HTTP Body 내용을 Java Object로 변환시켜주는 역할
+//  CreateAccount의 Request객체 -> 요청 : RequestBody -> 그 값중 getUserId,getInitialBalance를 통해 들어옴.
     public CreateAccount.Response createAccount(
             @RequestBody @Valid CreateAccount.Request request
     ) {
-        accountService.createAccount(
-                request.getUserId(),
-                request.getInitialBalance());
-        return "success";
+        return CreateAccount.Response.from(
+                accountService.createAccount(
+                        request.getUserId(),
+                        request.getInitialBalance()
+                )
+        );
     }
 
     @GetMapping("/account/{id}")
