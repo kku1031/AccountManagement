@@ -9,7 +9,10 @@ import java.time.LocalDateTime;
 public class CreateAccount {
     @Getter
     @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     //이너클래스 생성 : 명시적으로 알아보기 쉬움., static으로 맞춰야함.
+
     public static class Request {
         @NotNull
         @Min(1)
