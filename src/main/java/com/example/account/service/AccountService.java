@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.account.type.AccountStatus.IN_USE;
+import static com.example.account.type.ErrorCode.*;
 
 @Service //서비스타입 빈으로 스프링을 자동으로 등록을 해주기 위해서!
 @RequiredArgsConstructor //꼭 필요한 argument가 들어간 생성자를 만들어줌. final 타입만 담긴 생성자 형성
@@ -35,7 +38,7 @@ public class AccountService {
     @Transactional
     public AccountDto createAccount(Long userId, Long initialBalance) {
         AccountUser accountUser = accountUserRepository.findById(userId)    //유저 아이디 조회
-                .orElseThrow(() -> new AccountException(ErrorCode.USER_NOT_FOUND)); //사용자가 없을 때
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND)); //사용자가 없을 때
         //AccountUser 계좌 count
         validateCreateAccount(accountUser);
 
@@ -60,7 +63,7 @@ public class AccountService {
 
     private void validateCreateAccount(AccountUser accountUser) {
         if (accountRepository.countByAccountUser(accountUser) >= 10) {
-            throw new AccountException(ErrorCode.MAX_ACCOUNT_PER_USER_10);
+            throw new AccountException(MAX_ACCOUNT_PER_USER_10);
         }
     }
 
@@ -78,9 +81,9 @@ public class AccountService {
     @Transactional
     public AccountDto deleteAccount(Long userId, String accountNumber) {
         AccountUser accountUser = accountUserRepository.findById(userId)                //유저 아이디 조회
-                .orElseThrow(() -> new AccountException(ErrorCode.USER_NOT_FOUND));     //사용자가 없을 때
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));     //사용자가 없을 때
         Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountException(ErrorCode.ACCOUNT_NOT_FOUND));  //계좌가 없을 때,
+                .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));  //계좌가 없을 때,
         validateDeleteAccount(accountUser, account);
 
         //계좌 해지 후 -> 상태 업데이트, 시간등록
@@ -95,13 +98,29 @@ public class AccountService {
 
     private void validateDeleteAccount(AccountUser accountUser, Account account) {
         if (accountUser.getId() != account.getAccountUser().getId()) {
-            throw new AccountException(ErrorCode.USER_ACCOUNT_UN_MATCH) ;            //사용자 아이디, 계좌 소유주가 다른 경우
+            throw new AccountException(USER_ACCOUNT_UN_MATCH) ;            //사용자 아이디, 계좌 소유주가 다른 경우
         }
         if (account.getAccountStatus() == AccountStatus.UNREGISTERED) {
-            throw new AccountException(ErrorCode.ACCOUNT_ALREADY_UNREGISTERED) ;     //계좌가 이미 해지 상태인 경우
+            throw new AccountException(ACCOUNT_ALREADY_UNREGISTERED) ;     //계좌가 이미 해지 상태인 경우
         }
         if (account.getBalance() > 0) {
-            throw new AccountException(ErrorCode.BALANCE_NOT_EMPTY);                //잔액이 있는 경우 실패 응답
+            throw new AccountException(BALANCE_NOT_EMPTY);                //잔액이 있는 경우 실패 응답
         }
+    }
+
+    //계좌확인- GET /account?user_id={userId}
+    //파라미터 : 사용자 아이디
+    //정책 : 사용자 없는 경우 실패 응답
+    //성공 응답 : List<계좌번호, 잔액> 구조로 응답(사용 중인 계좌만)
+    public List<AccountDto> getAccountsByUserId(Long userId) {
+        AccountUser accountUser = accountUserRepository.findById(userId)
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+
+        List<Account> accounts = accountRepository.findByAccountUser(accountUser);
+
+        //List<Account>를 List<AccountDto> 타입으로 변환.
+        return accounts.stream()
+                .map(AccountDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

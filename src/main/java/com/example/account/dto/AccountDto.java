@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class AccountDto {
     //Entity 클래스와 비슷한데 필요한 부분만 넣어둬서 응답에 필요한 데이터 처리
+    //Controller와 Service간에 데이터 주고 받는데 최적화된 Dto
     private Long userId;
     private String accountNumber;
     private Long balance;

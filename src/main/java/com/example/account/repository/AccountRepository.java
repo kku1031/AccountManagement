@@ -22,4 +22,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     //계좌번호 찾기 : Account의 accountNumber에서
     Optional<Account> findByAccountNumber(String AccountNumber);
 
+    //계좌 확인
+    List<Account> findByAccountUser(AccountUser accountUser);
 }
