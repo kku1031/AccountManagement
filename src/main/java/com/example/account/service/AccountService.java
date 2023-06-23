@@ -7,7 +7,6 @@ import com.example.account.exception.AccountException;
 import com.example.account.repository.AccountRepository;
 import com.example.account.repository.AccountUserRepository;
 import com.example.account.type.AccountStatus;
-import com.example.account.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -112,6 +111,7 @@ public class AccountService {
     //파라미터 : 사용자 아이디
     //정책 : 사용자 없는 경우 실패 응답
     //성공 응답 : List<계좌번호, 잔액> 구조로 응답(사용 중인 계좌만)
+    @Transactional
     public List<AccountDto> getAccountsByUserId(Long userId) {
         AccountUser accountUser = accountUserRepository.findById(userId)
                 .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
