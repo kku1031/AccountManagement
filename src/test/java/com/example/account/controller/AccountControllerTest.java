@@ -3,10 +3,12 @@ package com.example.account.controller;
 import com.example.account.domain.Account;
 import com.example.account.dto.AccountDto;
 import com.example.account.dto.CreateAccount;
+import com.example.account.dto.DeleteAccount;
 import com.example.account.service.AccountService;
 import com.example.account.service.RedisTestService;
 import com.example.account.type.AccountStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,9 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -79,5 +81,29 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.accountNumber").value("3456"))
                 .andExpect(jsonPath("$.accountStatus").value("IN_USE"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("삭제성공테스트")
+    void successDeleteAccount () throws Exception {
+        //given 어떤 데이터가 있을 때,
+        given(accountService.deleteAccount(anyLong(), anyString()))
+                .willReturn(AccountDto.builder()
+                        .userId(1L)
+                        .accountNumber("1234567890")
+                        .registeredAt(LocalDateTime.now())
+                        .unRegisteredAt(LocalDateTime.now())
+                        .build());
+        //then 어떤 결과가 나와야한다
+        mockMvc.perform(delete("/account")
+                        //커뮤니티 버전에서는 http 사용할수 없어서 살짝 수정
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(
+                                new DeleteAccount.Request(3333L,"0987654321")
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.accountNumber").value("1234567890"))
+                .andDo(print());
     }
 }
