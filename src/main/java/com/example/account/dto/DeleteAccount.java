@@ -3,41 +3,45 @@ package com.example.account.dto;
 import lombok.*;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-public class CreateAccount {
+//계좌해지
+public class DeleteAccount {
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    //이너클래스 생성 : 명시적으로 알아보기 쉬움., static으로 맞춰야함.
-
     public static class Request {
         @NotNull
         @Min(1)
         private Long userId;
 
-        @NotNull
-        @Min(0)
-        private Long initialBalance;
+        //해지 대상 계좌번호
+        //validation 강도 높음,@NotBlank 는 null 과 "" 과 " " 모두 허용 X
+        @NotBlank
+        //문자열 길이 확인
+        @Size(min = 10, max = 10)
+        private String accountNumber; //=> 계좌번호 : 10자리의 비지 않은 문자.
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @AllArgsConstructor //빌더가 들어간 객체를 상속 받을 때 ALL,NoArgsConstructor 써야 문제 없음
-    @Builder //빌더로 객체 생성
+    @AllArgsConstructor
+    @Builder
     public static class Response {
-        private Long userId;    //유저아이디
-        private String accountNumber;       //계좌번호
-        private LocalDateTime registeredAt;     //등록일시
+        private Long userId;
+        private String accountNumber;
+        private LocalDateTime unRegisteredAt;
 
         public static Response from(AccountDto accountDto) {
             return Response.builder()
                     .userId(accountDto.getUserId())
                     .accountNumber(accountDto.getAccountNumber())
-                    .registeredAt(accountDto.getRegisteredAt())
+                    .unRegisteredAt(accountDto.getUnRegisteredAt())
                     .build();
         }
     }

@@ -13,9 +13,13 @@ import java.util.Optional;
 
 @Repository //Account라는 테이블에 접속하기 위한 Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    Optional<Account> findFirstByOrderByIdDesc(); //값이 있을 수도 없을 수도 있으니 Optional
+    //최근에 추가된 계좌조회 : 값이 있을 수도 없을 수도 있으니 Optional
+    Optional<Account> findFirstByOrderByIdDesc();
 
-    //Account안에 accountUser를 연관관계로 가지고 있기 때문에 가능
-    //1인당 가지고 있는 계좌 정보 count
+    //1인당 계좌 개수를 조회 : Account안에 accountUser를 연관관계로 가지고 있기 때문에 가능
     Integer countByAccountUser(AccountUser accountUser);
+
+    //계좌번호 찾기 : Account의 accountNumber에서
+    Optional<Account> findByAccountNumber(String AccountNumber);
+
 }
