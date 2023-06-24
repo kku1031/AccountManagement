@@ -1,4 +1,4 @@
-package com.example.account.controller;
+package com.example.account.service;
 
 import com.example.account.domain.Account;
 import com.example.account.domain.AccountUser;

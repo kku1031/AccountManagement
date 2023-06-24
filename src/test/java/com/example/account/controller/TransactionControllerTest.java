@@ -2,6 +2,7 @@ package com.example.account.controller;
 
 import com.example.account.dto.TransactionDto;
 import com.example.account.dto.UseBalance;
+import com.example.account.service.TransactionService;
 import com.example.account.type.TransactionResultType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
