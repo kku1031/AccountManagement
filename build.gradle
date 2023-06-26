@@ -34,8 +34,9 @@ dependencies {
 	implementation('it.ozimov:embedded-redis:0.7.3') {
 		exclude group: "org.slf4j", module: "slf4j-simple"	//의존성 추가는 하지만 요건 좀 뺄게.
 	}
+    implementation 'org.jetbrains:annotations:24.0.0'
 
-	compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'		//기본 테스트를 위한 진행(자동으로 만들어짐)
