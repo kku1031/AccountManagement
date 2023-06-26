@@ -18,11 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Transaction {
-    //Transaction 테이블 : pk - id
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Transaction extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;              //잔액 사용, 취소
@@ -37,9 +33,5 @@ public class Transaction {
     private String transactionId;                         //거래 고유 ID(거래건 노출 방지)
     private LocalDateTime transactedAt;                   //거래 후 시간, updatedAt에 영향 안받도록 별도 처리
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }
 

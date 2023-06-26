@@ -36,8 +36,8 @@ public class AccountService {
      */
     @Transactional
     public AccountDto createAccount(Long userId, Long initialBalance) {
-        AccountUser accountUser = accountUserRepository.findById(userId)    //유저 아이디 조회
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND)); //사용자가 없을 때
+        //유저 아이디 조회, //사용자가 없을 때
+        AccountUser accountUser = getAccountUser(userId);
         //AccountUser 계좌 count
         validateCreateAccount(accountUser);
 
@@ -79,8 +79,7 @@ public class AccountService {
     //계좌 해지
     @Transactional
     public AccountDto deleteAccount(Long userId, String accountNumber) {
-        AccountUser accountUser = accountUserRepository.findById(userId)                //유저 아이디 조회
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));     //사용자가 없을 때
+        AccountUser accountUser = getAccountUser(userId);
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));  //계좌가 없을 때,
         validateDeleteAccount(accountUser, account);
@@ -97,10 +96,10 @@ public class AccountService {
 
     private void validateDeleteAccount(AccountUser accountUser, Account account) {
         if (accountUser.getId() != account.getAccountUser().getId()) {
-            throw new AccountException(USER_ACCOUNT_UN_MATCH) ;            //사용자 아이디, 계좌 소유주가 다른 경우
+            throw new AccountException(USER_ACCOUNT_UN_MATCH);            //사용자 아이디, 계좌 소유주가 다른 경우
         }
         if (account.getAccountStatus() == AccountStatus.UNREGISTERED) {
-            throw new AccountException(ACCOUNT_ALREADY_UNREGISTERED) ;     //계좌가 이미 해지 상태인 경우
+            throw new AccountException(ACCOUNT_ALREADY_UNREGISTERED);     //계좌가 이미 해지 상태인 경우
         }
         if (account.getBalance() > 0) {
             throw new AccountException(BALANCE_NOT_EMPTY);                //잔액이 있는 경우 실패 응답
@@ -113,8 +112,7 @@ public class AccountService {
     //성공 응답 : List<계좌번호, 잔액> 구조로 응답(사용 중인 계좌만)
     @Transactional
     public List<AccountDto> getAccountsByUserId(Long userId) {
-        AccountUser accountUser = accountUserRepository.findById(userId)
-                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+        AccountUser accountUser = getAccountUser(userId);
 
         List<Account> accounts = accountRepository.findByAccountUser(accountUser);
 
@@ -122,5 +120,10 @@ public class AccountService {
         return accounts.stream()
                 .map(AccountDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    private AccountUser getAccountUser(Long userId) {
+        return accountUserRepository.findById(userId)
+                .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
     }
 }

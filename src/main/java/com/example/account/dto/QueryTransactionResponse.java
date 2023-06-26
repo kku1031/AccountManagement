@@ -1,7 +1,5 @@
-package com.example.account.domain;
+package com.example.account.dto;
 
-import com.example.account.dto.CancelBalance;
-import com.example.account.dto.TransactionDto;
 import com.example.account.type.TransactionResultType;
 import com.example.account.type.TransactionType;
 import lombok.*;

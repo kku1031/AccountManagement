@@ -1,7 +1,7 @@
 package com.example.account.controller;
 
 import com.example.account.aop.AccountLock;
-import com.example.account.domain.QueryTransactionResponse;
+import com.example.account.dto.QueryTransactionResponse;
 import com.example.account.dto.CancelBalance;
 import com.example.account.dto.UseBalance;
 import com.example.account.exception.AccountException;

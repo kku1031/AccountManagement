@@ -17,12 +17,7 @@ import java.time.LocalDateTime;
 @Builder //빌더로 객체 생성
 @Entity //Account 엔티티(일종의 설정 클래스)
 @EntityListeners(AuditingEntityListener.class) //config쪽에 전체 설정을 넣어주어야 어노테이션 작동
-public class Account {
-    //Account 테이블에 pk를 id로 지정하겠다
-    @Id
-    @GeneratedValue
-    private Long id;
-
+public class Account extends BaseEntity{
     //컬럼 추가
     @ManyToOne //유저를 N:1로 가짐. DB테이블에 user가 있어서 충돌날수도, AccountUser로 명시
     private AccountUser accountUser;
@@ -35,13 +30,6 @@ public class Account {
     private LocalDateTime registeredAt;
     private LocalDateTime unRegisteredAt;
 
-    //모든 테이블이 공통적으로 가지고 있으면 좋다, JPA에서 자동으로 저장해줌
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-
     //TransactionService에서 직접 금액을 조절하면 안정성의 위험이 있어서 이클래스에서 처리.
     public void useBalance(Long amount) {
         if (amount > balance) {
@@ -49,7 +37,6 @@ public class Account {
         }
         balance -=amount;
     }
-
 
     public void cancelBalance(Long amount) {
         if (amount < 0) {
