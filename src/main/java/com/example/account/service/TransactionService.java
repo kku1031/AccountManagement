@@ -89,7 +89,7 @@ public class TransactionService {
 
         return transactionRepository.save(
                 Transaction.builder()
-                        .transactionType(USE)
+                        .transactionType(transactionType)
                         .transactionResultType(transactionResultType)
                         .account(account)
                         .amount(amount)
@@ -118,9 +118,8 @@ public class TransactionService {
         );
     }
 
-
     private void validateCancelBalance(Transaction transaction, Account account, Long amount) {
-        if (transaction.getAccount().getId() != account.getId()) {
+        if (!Objects.equals(transaction.getAccount().getId(), account.getId())) {
             throw new AccountException(ErrorCode.TRANSACTION_ACCOUNT_UN_MATCH);
         }
         if (!Objects.equals(transaction.getAmount(), amount)) {
@@ -137,5 +136,13 @@ public class TransactionService {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountException(ErrorCode.ACCOUNT_NOT_FOUND));
         saveAndGetTransaction(CANCEL, F, account, amount);
+    }
+
+    @Transactional
+    public TransactionDto queryTransaction(String transactionId) {
+        return TransactionDto.fromEntity(
+                transactionRepository.findByTransactionId(transactionId)
+                        .orElseThrow(() -> new AccountException(ErrorCode.TRANSACTION_NOT_FOUND))
+        );
     }
 }
