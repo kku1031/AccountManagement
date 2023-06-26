@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.example.account.type.TransactionResultType.*;
@@ -110,7 +111,7 @@ public class TransactionService {
 
         validateCancelBalance(transaction, account, amount);
 
-        account.useBalance(amount);
+        account.cancelBalance(amount);
 
         return TransactionDto.fromEntity(
                 saveAndGetTransaction(CANCEL, S, account, amount)
@@ -122,7 +123,7 @@ public class TransactionService {
         if (transaction.getAccount().getId() != account.getId()) {
             throw new AccountException(ErrorCode.TRANSACTION_ACCOUNT_UN_MATCH);
         }
-        if (transaction.getAmount() != amount) {
+        if (!Objects.equals(transaction.getAmount(), amount)) {
             throw new AccountException(ErrorCode.CANCEL_MUST_FULLY);
         }
         //현재시간부터 1년전보다 이전시간이면

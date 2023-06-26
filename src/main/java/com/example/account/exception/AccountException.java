@@ -20,4 +20,9 @@ public class AccountException extends RuntimeException {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
     }
+
+    @Override
+    public String getMessage() {
+        return errorMessage; // 예외 메시지로 errorMessage 반환
+    }
 }
