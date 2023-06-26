@@ -1,0 +1,17 @@
+# 계좌관리시스템(AccountManagement)
+- 활용 DB : H2 DB(memory DB 모드)
+- DB접근방식 : Spring data jpa
+- 보조서버 : Embedded redis
+- API Request 및 Response : json 타입
+#
+✅ 구현기능
+#
+✅ 계좌 관련 API
+1) 계좌 생성
+2) 계좌 해지
+3) 계좌 확인
+
+✅ 거래(Transaction) 관련 API
+1) 잔액 사용
+2) 잔액 사용 취소
+3) 거래 확인
